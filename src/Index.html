@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #2A73A3;
+    --primary-dark: #1F5A80;
+    --logo-blue: #75B5DC;
+    --blue-tint: #EAF4FA;
+    --pink-tint: #FBF0F5;
+    --pink-border: #E3BFD2;
+    --pink-text: #8A3D66;
+    --bg: #F4F8FB;
+    --text: #1A2330;
+    --muted: #586474;
+    --border: #DCE5EC;
+    --input-border: #C8D6E1;
+    --warn-bg: #FFF8EC;
+    --warn-border: #EBCB94;
+    --warn-text: #7A4A00;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', system-ui, sans-serif; }
+  a { color: var(--primary); } a:hover { color: var(--primary-dark); }
+  button, input, textarea { font: inherit; }
+  .hidden { display: none !important; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ログイン */
+  .login-wrap { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 48px 20px; }
+  .login-card { width: 100%; max-width: 440px; background: #fff; border: 1px solid var(--border); border-top: 4px solid var(--logo-blue); border-radius: 16px; padding: 40px 36px; display: flex; flex-direction: column; gap: 28px; }
+  .login-head { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+  .login-head img { height: 48px; width: auto; }
+  .login-head h1 { margin: 0; font-size: 22px; }
+  .login-head p { margin: 0; font-size: 14px; line-height: 1.8; color: var(--muted); }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label { font-size: 14px; font-weight: 700; }
+  .field input { min-height: 48px; border: 1px solid var(--input-border); border-radius: 10px; padding: 0 14px; font-size: 16px; letter-spacing: .08em; color: var(--text); background: #fff; }
+  .check { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .check input { width: 20px; height: 20px; margin: 0; accent-color: var(--primary); }
+  .btn-primary { min-height: 50px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:disabled { opacity: .6; cursor: default; }
+  .error { margin: 0; font-size: 13px; color: #B3261E; }
+  .contact-box { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; background: var(--pink-tint); border: 1px solid #EFD6E3; border-radius: 10px; font-size: 13px; line-height: 1.7; }
+  .contact-box p { margin: 0; }
+  .note { margin: 0; font-size: 12px; line-height: 1.7; color: var(--muted); text-align: center; }
+  form.login-form { display: flex; flex-direction: column; gap: 18px; }
+
+  /* チャット */
+  .app { min-height: 100%; display: flex; flex-direction: column; }
+  header.top { background: #fff; border-bottom: 3px solid var(--logo-blue); }
+  .top-inner { max-width: 1040px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand img { height: 34px; width: auto; display: block; }
+  .divider { width: 1px; height: 32px; background: var(--border); }
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-text strong { font-size: 17px; line-height: 1.3; }
+  .brand-text span { font-size: 12px; color: var(--muted); }
+  .account { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+  .account .name { font-weight: 500; }
+  .link-btn { background: none; border: none; padding: 8px 0; color: var(--primary); text-decoration: underline; cursor: pointer; font-size: 13px; min-height: 44px; }
+
+  main.thread { flex: 1; width: 100%; max-width: 800px; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 24px; }
+  .row-ai { display: flex; gap: 12px; align-items: flex-start; }
+  .avatar { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--blue-tint); border: 1.5px solid var(--logo-blue); color: var(--primary); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .card { flex: 1; min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 1.8; }
+  .card p { margin: 0; }
+  .card ul { margin: 0; padding-left: 20px; }
+  .card .ref { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .card.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .card.warn .warn-title { font-weight: 700; color: var(--warn-text); }
+  .card.loading { color: var(--muted); }
+  .chips-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { min-height: 44px; padding: 8px 14px; border-radius: 22px; border: 1px solid var(--pink-border); background: var(--pink-tint); color: var(--pink-text); font-size: 14px; cursor: pointer; text-align: left; }
+  .chip:hover { border-color: var(--pink-text); }
+  .row-user { display: flex; justify-content: flex-end; }
+  .bubble { max-width: 80%; background: var(--primary); color: #fff; border-radius: 14px 14px 4px 14px; padding: 14px 18px; font-size: 15px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  .feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid #EDF2F6; font-size: 13px; color: var(--muted); }
+  .feedback button { min-height: 44px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--input-border); background: #fff; color: var(--text); font-size: 13px; cursor: pointer; }
+  .feedback button:disabled { cursor: default; opacity: .6; }
+  .dots::after { content: '…'; animation: dots 1.2s steps(4) infinite; display: inline-block; width: 1.2em; overflow: hidden; vertical-align: bottom; }
+  @keyframes dots { 0% { width: 0; } 100% { width: 1.2em; } }
+
+  .composer { background: #fff; border-top: 1px solid var(--border); position: sticky; bottom: 0; }
+  .composer-inner { max-width: 800px; margin: 0 auto; padding: 16px 24px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .composer form { display: flex; gap: 10px; align-items: flex-end; }
+  .composer textarea { flex: 1; min-width: 0; resize: none; border: 1px solid var(--input-border); border-radius: 12px; padding: 12px 14px; font-size: 16px; line-height: 1.6; color: var(--text); background: #fff; }
+  .send { flex: none; min-height: 48px; padding: 0 22px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .send:hover { background: var(--primary-dark); }
+  .send:disabled { opacity: .6; cursor: default; }
+  .disclaimer { margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .login-card { padding: 32px 22px; }
+    .top-inner { padding: 12px 16px; }
+    .brand img { height: 26px; }
+    .divider, .brand-text span { display: none; }
+    main.thread { padding: 16px; gap: 16px; }
+    .card { padding: 14px 16px; font-size: 14px; }
+    .bubble { max-width: 85%; font-size: 14px; }
+    .composer-inner { padding: 12px 16px 16px; }
+    .send-label { display: none; }
+    .send { padding: 0; width: 48px; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="login" class="login-wrap hidden">
+  <div class="login-card">
+    <div class="login-head">
+      <img src="data:image/png;base64,<?!= include_('LogoData') ?>" alt="hagukumi 看護">
+      <h1><?= appTitle ?></h1>
+      <p>本部から案内されたアクセスコードを入力してください。</p>
+    </div>
+    <form id="login-form" class="login-form">
+      <div class="field">
+        <label for="code">アクセスコード</label>
+        <input id="code" type="text" placeholder="例：AB12CD34EF" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+      </div>
+      <div class="check">
+        <input id="remember" type="checkbox" checked>
+        <label for="remember">この端末でコードを記憶する</label>
+      </div>
+      <p id="login-error" class="error hidden" role="alert"></p>
+      <button id="login-btn" type="submit" class="btn-primary">はじめる</button>
+    </form>
+    <div class="contact-box">
+      <p>コードがわからない・使えない場合は、本部にお問い合わせください。</p>
+      <p>問い合わせ先：<?= contact ?></p>
+    </div>
+    <p class="note">アクセスコードは貴社専用です。社外の方には渡さないでください。</p>
+  </div>
+</div>
+
+<!-- チャット画面 -->
+<div id="app" class="app hidden">
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <img src="data:image/png;base64,<?!= include_('LogoData') ?>" alt="hagukumi 看護">
+        <div class="divider"></div>
+        <div class="brand-text">
+          <strong><?= appTitle ?></strong>
+          <span>本部のQ&amp;Aをもとに、AIがお答えします</span>
+        </div>
+      </div>
+      <div class="account">
+        <span id="client-name" class="name"></span>
+        <button id="logout" type="button" class="link-btn">ログアウト</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="thread" class="thread" aria-live="polite">
+    <div class="row-ai">
+      <div class="avatar" aria-hidden="true">AI</div>
+      <div class="card">
+        <p>こんにちは。加算・指示書・請求・採用・働き方などについて、本部のQ&amp;Aをもとにお答えします。質問をそのまま文章で入力してください。</p>
+        <div>
+          <div class="chips-label">よくある質問</div>
+          <div id="chips" class="chips" style="margin-top: 8px"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="composer">
+    <div class="composer-inner">
+      <form id="ask-form">
+        <label for="question" class="sr-only">質問を入力</label>
+        <textarea id="question" rows="2" maxlength="<?= maxLength ?>" placeholder="質問を入力してください（例：複数名訪問加算の条件は？）"></textarea>
+        <button id="send" type="submit" class="send" aria-label="送信">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg>
+          <span class="send-label">送信</span>
+        </button>
+      </form>
+      <p class="disclaimer">AIの回答です。算定・請求の最終判断は本部にご確認ください。　問い合わせ先：<?= contact ?></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  var SUGGESTIONS = <?!= suggestionsJson ?>;
+  var STORE_KEY = 'houmon_qa_code';
+  var code = '';
+  var busy = false;
+
+  function $(id) { return document.getElementById(id); }
+  function show(id) { $(id).classList.remove('hidden'); }
+  function hide(id) { $(id).classList.add('hidden'); }
+  function store(v) { try { v ? localStorage.setItem(STORE_KEY, v) : localStorage.removeItem(STORE_KEY); } catch (e) {} }
+  function stored() { try { return localStorage.getItem(STORE_KEY) || ''; } catch (e) { return ''; } }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function call(fn, args, ok, ng) {
+    var r = google.script.run.withSuccessHandler(ok).withFailureHandler(ng || function () {
+      ok({ ok: false, message: '通信エラーが発生しました。少し時間をおいて再度お試しください。' });
+    });
+    r[fn].apply(r, args);
+  }
+
+  /* ---------- ログイン ---------- */
+  function showLogin(message) {
+    hide('app'); show('login');
+    if (message) { $('login-error').textContent = message; show('login-error'); } else { hide('login-error'); }
+    $('code').focus();
+  }
+  function enterApp(name) {
+    $('client-name').textContent = name + ' 様';
+    hide('login'); show('app');
+    $('question').focus();
+  }
+  $('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var c = $('code').value.trim();
+    if (!c) return;
+    $('login-btn').disabled = true;
+    call('webLogin', [c], function (res) {
+      $('login-btn').disabled = false;
+      if (!res.ok) return showLogin(res.message);
+      code = c;
+      store($('remember').checked ? c : '');
+      enterApp(res.name);
+    });
+  });
+  $('logout').addEventListener('click', function () {
+    code = ''; store('');
+    $('code').value = '';
+    showLogin('');
+  });
+
+  /* ---------- チャット ---------- */
+  function scrollToEnd() { window.scrollTo(0, document.body.scrollHeight); }
+
+  function addUser(text) {
+    var row = document.createElement('div');
+    row.className = 'row-user';
+    row.innerHTML = '<div class="bubble"></div>';
+    row.firstChild.textContent = text;
+    $('thread').appendChild(row);
+  }
+  function addAiCard() {
+    var row = document.createElement('div');
+    row.className = 'row-ai';
+    row.innerHTML = '<div class="avatar" aria-hidden="true">AI</div><div class="card loading"><p>回答を作成しています<span class="dots"></span></p></div>';
+    $('thread').appendChild(row);
+    return row.lastChild;
+  }
+
+  // AIの回答（プレーンテキスト）を安全にHTMLへ
+  function inline(s) {
+    return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+  }
+  function renderAnswer(text) {
+    var lines = String(text).split('\n');
+    var html = '', list = [];
+    function flush() { if (list.length) { html += '<ul>' + list.join('') + '</ul>'; list = []; } }
+    lines.forEach(function (line) {
+      var t = line.trim();
+      if (!t) { flush(); return; }
+      var m = t.match(/^(?:[・•\-]|\*(?!\*))\s*(.+)$/);
+      if (m) { list.push('<li>' + inline(m[1]) + '</li>'); return; }
+      flush();
+      if (/^参照[：:]/.test(t)) html += '<p class="ref">' + inline(t) + '</p>';
+      else html += '<p>' + inline(t) + '</p>';
+    });
+    flush();
+    return html;
+  }
+
+  function fillAnswer(card, res) {
+    card.classList.remove('loading');
+    if (!res.ok) {
+      card.classList.add('warn');
+      card.innerHTML = '<p>' + esc(res.message) + '</p>';
+      if (res.logout) { setTimeout(function () { store(''); showLogin(res.message); }, 1500); }
+      return;
+    }
+    var text = res.answer;
+    if (res.notFound) {
+      card.classList.add('warn');
+      text = text.replace(/^【該当なし】\s*/, '');
+      card.innerHTML = '<p class="warn-title">【該当なし】</p>' + renderAnswer(text) +
+        '<p style="font-size:12px;color:var(--muted)">いただいた質問は、今後のQ&amp;A追加の参考にさせていただきます。</p>';
+    } else {
+      card.innerHTML = renderAnswer(text);
+    }
+    if (res.logId) {
+      var fb = document.createElement('div');
+      fb.className = 'feedback';
+      fb.innerHTML = '<span>この回答は役に立ちましたか？</span>' +
+        '<button type="button" data-v="1">役に立った</button>' +
+        '<button type="button" data-v="0">役に立たなかった</button>';
+      fb.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b) return;
+        fb.querySelectorAll('button').forEach(function (x) { x.disabled = true; });
+        call('webFeedback', [code, res.logId, b.getAttribute('data-v') === '1'], function () {
+          fb.innerHTML = '<span>ご回答ありがとうございます。</span>';
+        });
+      });
+      card.appendChild(fb);
+    }
+  }
+
+  function ask(text) {
+    text = String(text || '').trim();
+    if (!text || busy) return;
+    busy = true;
+    $('send').disabled = true;
+    addUser(text);
+    var card = addAiCard();
+    scrollToEnd();
+    call('webAsk', [code, text], function (res) {
+      fillAnswer(card, res);
+      busy = false;
+      $('send').disabled = false;
+      scrollToEnd();
+    });
+  }
+
+  $('ask-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('question').value;
+    $('question').value = '';
+    ask(v);
+  });
+  $('question').addEventListener('keydown', function (e) {
+    // Ctrl+Enter / ⌘+Enter で送信（Enter だけは改行）
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $('ask-form').requestSubmit(); }
+  });
+
+  SUGGESTIONS.forEach(function (s) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.textContent = s;
+    b.addEventListener('click', function () { ask(s); });
+    $('chips').appendChild(b);
+  });
+
+  /* ---------- 起動 ---------- */
+  (function start() {
+    var saved = stored();
+    if (!saved) return showLogin('');
+    call('webLogin', [saved], function (res) {
+      if (!res.ok) { store(''); return showLogin(''); }
+      code = saved;
+      enterApp(res.name);
+    });
+  })();
+</script>
+</body>
+</html>
